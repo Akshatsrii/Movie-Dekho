@@ -26,7 +26,7 @@ import ListBookings from './pages/admin/ListBookings';
 import { useAppContext } from './context/AppContext';
 
 const AdminRouteWrapper = () => {
-  const { user, isAdmin, getToken, axios, fetchIsAdmin } = useAppContext();
+  const { user, isAdmin, setIsAdmin, getToken, axios, fetchIsAdmin } = useAppContext();
   const [email, setEmail] = React.useState("");
   const [password, setPassword] = React.useState("");
   const [isLoggingIn, setIsLoggingIn] = React.useState(false);
@@ -45,6 +45,7 @@ const AdminRouteWrapper = () => {
 
       if (data.success) {
         toast.success(data.message || "Admin access verified successfully!", { id: loadingToast });
+        setIsAdmin(true);
         await fetchIsAdmin();
       } else {
         toast.error(data.message || "Invalid Admin Email or Password.", { id: loadingToast });

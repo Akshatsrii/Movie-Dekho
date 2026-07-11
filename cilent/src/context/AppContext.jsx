@@ -81,6 +81,7 @@ export const AppProvider = ({ children }) => {
     navigate,
     location,
     isAdmin,
+    setIsAdmin,
     fetchIsAdmin,
     shows,
     fetchShows,
