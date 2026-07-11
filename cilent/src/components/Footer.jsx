@@ -50,10 +50,10 @@ const Footer = () => {
             </div>
           </div>
 
-          {/* Column 2: Company Links */}
+          {/* Column 2: Explore Links */}
           <div className="space-y-4">
             <h4 className="text-white font-semibold text-lg mb-4 relative w-fit">
-              Company
+              Explore
               <span className="absolute -bottom-1.5 left-0 w-8 h-[2px] bg-[#e51e25] rounded-full" />
             </h4>
             <ul className="space-y-3 text-sm flex flex-col">
@@ -61,13 +61,16 @@ const Footer = () => {
                 <Link to="/" className="footer-link text-gray-400 hover:text-white block">Home</Link>
               </li>
               <li>
-                <Link to="/" className="footer-link text-gray-400 hover:text-white block">About us</Link>
+                <Link to="/movies" className="footer-link text-gray-400 hover:text-white block">Movies</Link>
               </li>
               <li>
-                <Link to="/" className="footer-link text-gray-400 hover:text-white block">Contact us</Link>
+                <Link to="/food-order" className="footer-link text-gray-400 hover:text-white block">Food Delivery</Link>
               </li>
               <li>
-                <Link to="/" className="footer-link text-gray-400 hover:text-white block">Privacy policy</Link>
+                <Link to="/" className="footer-link text-gray-400 hover:text-white block">Theaters</Link>
+              </li>
+              <li>
+                <Link to="/releases" className="footer-link text-gray-400 hover:text-white block">Releases</Link>
               </li>
             </ul>
           </div>
