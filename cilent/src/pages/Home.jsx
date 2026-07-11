@@ -1,17 +1,18 @@
 import React from "react";
-import HeroSection from "../components/HeroSection";  // <-- correct the path
+import HeroSection from "../components/HeroSection";
 import FeatureSection from "../components/FeatureSection";
-import TrailersSection from "../components/TrailersSection";
-import Footer from "../components/Footer";
-// or "./HeroSection" depending on your folder
+import SnackSection from "../components/SnackSection";
+import LoyaltySection from "../components/LoyaltySection";
+import FaqSection from "../components/FaqSection";
 
 const Home = () => {
   return (
     <>
       <HeroSection />
       <FeatureSection />
-      <TrailersSection />
-     
+      <SnackSection />
+      <LoyaltySection />
+      <FaqSection />
     </>
   );
 };

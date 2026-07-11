@@ -11,6 +11,9 @@ import SeatLayout from './pages/SeatLayout';
 import Footer from './components/Footer';
 import { SignIn } from "@clerk/clerk-react";
 import Payment from "./components/payment";
+import SelectSnacks from "./pages/SelectSnacks";
+import FoodOrder from "./pages/FoodOrder";
+import CheckIn from "./pages/CheckIn";
 
 
 
@@ -34,8 +37,12 @@ const App = () => {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/movies" element={<Movies />} />
+        <Route path="/releases" element={<Movies />} />
         <Route path="/movies/:id" element={<MovieDetails />} />
         <Route path="/movies/:id/:date" element={<SeatLayout />} />
+        <Route path="/movies/:id/:date/snacks" element={<SelectSnacks />} />
+        <Route path="/food-order" element={<FoodOrder />} />
+        <Route path="/checkin/:bookingId" element={<CheckIn />} />
         <Route path="/favorite" element={<Favourite />} />
         <Route path="/my-bookings" element={<MyBookings />} />
         <Route path="/seat-layout" element={<SeatLayout />} />

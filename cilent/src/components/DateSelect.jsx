@@ -34,14 +34,14 @@ const DateSelect = ({ dateTime, id }) => {
   };
 
   return (
-    <div className="bg-zinc-900 shadow-2xl shadow-red-900/20 rounded-xl p-6 max-w-7xl mx-auto">
+    <div className="bg-white border border-[#e51e25]/20 shadow-2xl shadow-red-900/10 rounded-xl p-6 max-w-7xl mx-auto">
       <div className="flex flex-col sm:flex-row justify-between items-center gap-6">
-        <p className="text-white text-xl font-bold tracking-wide flex-shrink-0">
+        <p className="text-zinc-950 text-xl font-bold tracking-wide flex-shrink-0">
           Choose Date
         </p>
 
         <div className="flex items-center gap-3 overflow-x-auto no-scrollbar py-2 flex-grow">
-          <button className="p-2 text-white/50 hover:text-white transition duration-200 flex-shrink-0">
+          <button className="p-2 text-zinc-400 hover:text-[#e51e25] transition duration-200 flex-shrink-0">
             <ChevronLeft className="w-6 h-6" />
           </button>
 
@@ -57,8 +57,8 @@ const DateSelect = ({ dateTime, id }) => {
                 onClick={() => setSelectedDate(item.date)}
                 className={`flex flex-col items-center justify-center p-2 h-16 w-16 rounded-lg font-bold text-sm transition-all duration-200 flex-shrink-0 ${
                   selectedDate === item.date
-                    ? "bg-red-600 text-white shadow-lg shadow-red-900/50 scale-105"
-                    : "bg-zinc-800 text-gray-300 hover:bg-zinc-700/80"
+                    ? "bg-[#e51e25] text-white shadow-lg shadow-red-900/40 scale-105"
+                    : "bg-zinc-100 text-zinc-600 hover:bg-zinc-200"
                 }`}
               >
                 <span className="text-xl leading-none">{dayNumber}</span>
@@ -67,14 +67,14 @@ const DateSelect = ({ dateTime, id }) => {
             );
           })}
 
-          <button className="p-2 text-white/50 hover:text-white transition duration-200 flex-shrink-0">
+          <button className="p-2 text-zinc-400 hover:text-[#e51e25] transition duration-200 flex-shrink-0">
             <ChevronRight className="w-6 h-6" />
           </button>
         </div>
 
         <button
           onClick={handleBookNow}
-          className="px-10 py-3 bg-red-600 hover:bg-red-700 rounded-lg text-base font-bold transition duration-200 shadow-xl shadow-red-900/70 uppercase tracking-wider flex-shrink-0"
+          className="px-10 py-3 bg-[#e51e25] hover:bg-[#c4161c] text-white hover:scale-105 active:scale-95 rounded-lg text-base font-bold transition-all duration-300 shadow-xl shadow-red-900/30 uppercase tracking-wider flex-shrink-0"
         >
           Book Now
         </button>

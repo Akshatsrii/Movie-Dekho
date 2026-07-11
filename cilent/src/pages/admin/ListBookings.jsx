@@ -146,21 +146,47 @@ const ListBookings = () => {
   });
 
   const getAllBookings = async () => {
-    setTimeout(() => {
-      setBookings(dummyBookingData);
+    try {
+      const localBookings = JSON.parse(localStorage.getItem("movie_bookings") || "[]");
+      const formattedBookings = localBookings.map(b => ({
+        user: { name: "Akshat Srivastav" },
+        show: { movie: { title: b.show.movie.title } },
+        seats: b.bookedSeats,
+        totalAmount: b.bookedSeats.length * b.show.pricePerSeat + (b.snacks || []).reduce((t, s) => t + s.price * s.quantity, 0),
+        createdAt: b.show.showDateTime,
+        isPaid: b.isPaid
+      }));
+
+      const localFood = JSON.parse(localStorage.getItem("theater_food_orders") || "[]");
+      const formattedFood = localFood.map(o => ({
+        user: { name: "Akshat Srivastav" },
+        show: { movie: { title: `F&B Delivery (${o.screen})` } },
+        seats: [`Seat ${o.seat}`],
+        totalAmount: o.amount,
+        createdAt: new Date().toISOString(),
+        isPaid: true
+      }));
+
+      const combined = [...formattedBookings, ...formattedFood];
+      const dataToUse = combined.length > 0 ? combined : dummyBookingData;
+      
+      setBookings(dataToUse);
       
       // Calculate stats
-      const totalRevenue = dummyBookingData.reduce((sum, b) => sum + b.totalAmount, 0);
-      const totalSeats = dummyBookingData.reduce((sum, b) => sum + b.seats.length, 0);
+      const totalRevenue = dataToUse.reduce((sum, b) => sum + b.totalAmount, 0);
+      const totalSeats = dataToUse.reduce((sum, b) => sum + (b.seats ? b.seats.length : 0), 0);
       
       setStats({
-        totalBookings: dummyBookingData.length,
+        totalBookings: dataToUse.length,
         totalRevenue,
         totalSeats
       });
       
       setIsLoading(false);
-    }, 1000);
+    } catch (err) {
+      console.error(err);
+      setIsLoading(false);
+    }
   };
 
   useEffect(() => {

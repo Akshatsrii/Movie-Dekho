@@ -2,66 +2,8 @@ import React, { useState, useEffect } from "react";
 import { Star, Calendar, DollarSign, Plus, Clock, Trash2 } from 'lucide-react';
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import { dummyShowsData } from "../../assets/assets";
 
-// Dummy data - replace with your actual data source
-const dummyShowsData = [
-  { 
-    id: 1,
-    title: "The Simpsons Movie", 
-    vote_average: 8.5, 
-    vote_count: 1250,
-    poster_path: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=500&h=750&fit=crop"
-  },
-  { 
-    id: 2,
-    title: "Avatar: The Way of Water", 
-    vote_average: 7.7, 
-    vote_count: 8540,
-    poster_path: "https://images.unsplash.com/photo-1594908900066-3f47337549d8?w=500&h=750&fit=crop"
-  },
-  { 
-    id: 3,
-    title: "Deadpool 3: Deadpool & Wolverine", 
-    vote_average: 8.8, 
-    vote_count: 9250,
-    poster_path: "https://images.unsplash.com/photo-1626814026160-2237a95fc5a0?w=500&h=750&fit=crop"
-  },
-  { 
-    id: 4,
-    title: "The Batman", 
-    vote_average: 8.3, 
-    vote_count: 7420,
-    poster_path: "https://images.unsplash.com/photo-1509347528160-9a9e33742cdb?w=500&h=750&fit=crop"
-  },
-  { 
-    id: 5,
-    title: "Venom: The Last Dance", 
-    vote_average: 7.9, 
-    vote_count: 5630,
-    poster_path: "https://images.unsplash.com/photo-1478720568477-152d9b164e26?w=500&h=750&fit=crop"
-  },
-  { 
-    id: 6,
-    title: "In the Lost Lands", 
-    vote_average: 6.4, 
-    vote_count: 1200,
-    poster_path: "https://images.unsplash.com/photo-1440404653325-ab127d49abc1?w=500&h=750&fit=crop"
-  },
-  { 
-    id: 7,
-    title: "Until Dawn", 
-    vote_average: 6.4, 
-    vote_count: 1850,
-    poster_path: "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?w=500&h=750&fit=crop"
-  },
-  { 
-    id: 8,
-    title: "Lilo & Stitch", 
-    vote_average: 7.1, 
-    vote_count: 2750,
-    poster_path: "https://images.unsplash.com/photo-1524985069026-dd778a71c7b4?w=500&h=750&fit=crop"
-  }
-];
 
 // Blur Circle Component
 const BlurCircle = ({ position }) => {

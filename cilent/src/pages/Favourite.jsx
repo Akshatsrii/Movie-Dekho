@@ -15,7 +15,7 @@ const Favourite = () => {
       <BlurCircle bottom="-100px" right="-100px" /> {/* Right glow */}
 
       {/* Heading Section */}
-      <h1 className="text-2xl md:text-3xl font-semibold my-10 text-center text-gray-100 tracking-wide">
+      <h1 className="text-2xl md:text-3xl font-semibold my-10 text-center text-zinc-900 tracking-wide">
         ❤️ Your Favourite Movies
       </h1>
 
@@ -29,10 +29,10 @@ const Favourite = () => {
       ) : (
         // 🚫 When no favourites are available
         <div className="flex flex-col items-center justify-center h-[60vh] text-center">
-          <h2 className="text-3xl font-semibold text-gray-300 mb-4">
+          <h2 className="text-3xl font-semibold text-zinc-800 mb-4">
             No Favourite Movies Yet
           </h2>
-          <p className="text-gray-400 text-sm md:text-base">
+          <p className="text-zinc-500 text-sm md:text-base">
             Explore and add some movies to your favourites!
           </p>
         </div>

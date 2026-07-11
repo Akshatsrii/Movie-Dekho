@@ -1,39 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Film, Clock, Users, DollarSign, TrendingUp, Calendar } from 'lucide-react';
+import { dummyShowsData } from "../../assets/assets";
 
-// Dummy movie data
-const dummyShowsData = [
-  { 
-    id: 1,
-    title: "The Simpsons Movie", 
-    poster_path: "https://images.unsplash.com/photo-1536440136628-849c177e76a1?w=500&h=750&fit=crop"
-  },
-  { 
-    id: 2,
-    title: "Avatar: The Way of Water", 
-    poster_path: "https://images.unsplash.com/photo-1594908900066-3f47337549d8?w=500&h=750&fit=crop"
-  },
-  { 
-    id: 3,
-    title: "Deadpool 3: Deadpool & Wolverine", 
-    poster_path: "https://images.unsplash.com/photo-1626814026160-2237a95fc5a0?w=500&h=750&fit=crop"
-  },
-  { 
-    id: 4,
-    title: "The Batman", 
-    poster_path: "https://images.unsplash.com/photo-1509347528160-9a9e33742cdb?w=500&h=750&fit=crop"
-  },
-  { 
-    id: 5,
-    title: "Venom: The Last Dance", 
-    poster_path: "https://images.unsplash.com/photo-1478720568477-152d9b164e26?w=500&h=750&fit=crop"
-  },
-  { 
-    id: 6,
-    title: "Oppenheimer", 
-    poster_path: "https://images.unsplash.com/photo-1440404653325-ab127d49abc1?w=500&h=750&fit=crop"
-  }
-];
 
 const BlurCircle = ({ position }) => {
   const positions = {

@@ -16,23 +16,34 @@ const MovieCard = ({ movie }) => {
 
   return (
     <div
-      className="flex flex-col justify-between p-3 bg-gray-800 rounded-2xl hover:-translate-y-1 transition duration-300 w-64"
+      className="movie-card flex flex-col justify-between p-3 bg-white border border-[#e51e25]/20 rounded-2xl hover:-translate-y-1 transition-all duration-300 w-64"
     >
+      {/* Inline styles for red-theme polish only (no logic touched) */}
+      <style>{`
+        .movie-card:hover { border-color: rgba(229,30,37,0.5); box-shadow: 0 14px 30px rgba(229,30,37,0.18); }
+        .movie-card img { transition: transform 0.35s ease; }
+        .movie-card:hover img { transform: scale(1.03); }
+      `}</style>
+
       {/* Movie Poster */}
-      <img
-        onClick={handleNavigation}
-        src={movie.backdrop_path || movie.poster_path || "https://via.placeholder.com/300x450?text=No+Image"}
-        alt={movie.title}
-        className="rounded-lg h-52 w-full object-cover object-center cursor-pointer"
-      />
+      <div className="overflow-hidden rounded-lg">
+        <img
+          onClick={handleNavigation}
+          src={movie.backdrop_path || movie.poster_path || "https://via.placeholder.com/300x450?text=No+Image"}
+          alt={movie.title}
+          className="h-52 w-full object-cover object-center cursor-pointer"
+        />
+      </div>
 
       {/* Movie Info */}
-      <p className="font-semibold mt-2 truncate">{movie.title}</p>
-      <p className="text-sm text-gray-400 mt-2">
+      <p className="font-semibold mt-2 truncate text-zinc-950">{movie.title}</p>
+      <p className="text-sm text-zinc-500 mt-2">
         {movie.release_date ? new Date(movie.release_date).getFullYear() : "N/A"}
         {" | "}
         {Array.isArray(movie.genres)
-          ? movie.genres.slice(0, 2).map((genre) => genre.name).join(" | ")
+          ? movie.genres.slice(0, 2).map((g) => (typeof g === "string" ? g : g.name)).join(" | ")
+          : Array.isArray(movie.genre)
+          ? movie.genre.slice(0, 2).join(" | ")
           : "Genre N/A"}
         {" | "}
         {movie.runtime ? timeformat(movie.runtime) : "Duration N/A"}
@@ -42,12 +53,12 @@ const MovieCard = ({ movie }) => {
       <div className="flex items-center justify-between mt-4 pb-3">
         <button
           onClick={handleNavigation}
-          className="px-4 py-2 text-xs bg-pink-600 hover:bg-pink-700 transition rounded-full font-medium cursor-pointer"
+          className="px-4 py-2 text-xs bg-[#e51e25] hover:bg-[#c4161c] text-white hover:scale-105 active:scale-95 transition-all duration-300 rounded-full font-medium cursor-pointer shadow-[0_4px_14px_rgba(229,30,37,0.3)]"
         >
           Buy Tickets
         </button>
 
-        <p className="flex items-center gap-1 text-sm text-gray-400 mt-1 pr-1">
+        <p className="flex items-center gap-1 text-sm text-zinc-600 mt-1 pr-1">
           <StarIcon className="w-4 h-4 text-yellow-400 fill-yellow-400" />
           {movie.vote_average ? movie.vote_average.toFixed(1) : "N/A"}
         </p>
