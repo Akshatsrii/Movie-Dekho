@@ -1,5 +1,6 @@
 import React from 'react';
 import { Ticket, MapPin, Phone, Mail } from 'lucide-react';
+import { Link } from 'react-router-dom';
 import { assets } from '../assets/assets'; // Ensure logo.svg, googlePlay, and appStore are defined here
 
 const Footer = () => {
@@ -31,16 +32,15 @@ const Footer = () => {
 
           {/* Column 1: Logo and Description */}
           <div className="md:col-span-2 lg:col-span-2 space-y-6">
-            <div className="footer-logo flex items-center gap-2 select-none mb-6 w-fit cursor-pointer">
+            <Link to="/" className="footer-logo flex items-center gap-2 select-none mb-6 w-fit cursor-pointer">
               <Ticket className="footer-logo-icon w-8 h-8 text-[#e51e25]" />
               <span className="text-3xl font-extrabold tracking-tight text-white">
                 Movie<span className="text-[#e51e25] ml-0.5">Dekho</span>
               </span>
-            </div>
+            </Link>
 
             <p className="text-sm max-w-md leading-relaxed">
-              Lorem Ipsum has been the industry's standard dummy text ever since the 1500s,
-              when an unknown printer took a galley of type and scrambled it to make a type specimen book.
+              Movie Dekho is your premium booking platform for immediate movie tickets and gourmet cinema seat food delivery. Browse now showing films, secure your best seats, and enjoy a hassle-free cinema experience!
             </p>
 
             {/* App Store Links */}
@@ -56,11 +56,19 @@ const Footer = () => {
               Company
               <span className="absolute -bottom-1.5 left-0 w-8 h-[2px] bg-[#e51e25] rounded-full" />
             </h4>
-            <ul className="space-y-3 text-sm">
-              <li className="footer-link hover:text-white cursor-pointer">Home</li>
-              <li className="footer-link hover:text-white cursor-pointer">About us</li>
-              <li className="footer-link hover:text-white cursor-pointer">Contact us</li>
-              <li className="footer-link hover:text-white cursor-pointer">Privacy policy</li>
+            <ul className="space-y-3 text-sm flex flex-col">
+              <li>
+                <Link to="/" className="footer-link text-gray-400 hover:text-white block">Home</Link>
+              </li>
+              <li>
+                <Link to="/" className="footer-link text-gray-400 hover:text-white block">About us</Link>
+              </li>
+              <li>
+                <Link to="/" className="footer-link text-gray-400 hover:text-white block">Contact us</Link>
+              </li>
+              <li>
+                <Link to="/" className="footer-link text-gray-400 hover:text-white block">Privacy policy</Link>
+              </li>
             </ul>
           </div>
 
@@ -74,28 +82,28 @@ const Footer = () => {
             <div className="flex items-start gap-2.5 text-sm">
               <MapPin className="w-4 h-4 text-[#e51e25] mt-0.5 shrink-0" />
               <p className="leading-relaxed">
-                PVR Cinemas, Kota Mall,<br />
+                Movie Dekho Cinemas, Akshat Mall,<br />
                 Jhalawar Road, Kota,<br />
-                Rajasthan – 324007, India
+                Rajasthan – 324005, India
               </p>
             </div>
 
-            <div className="flex items-center gap-2.5 text-sm footer-link">
+            <a href="tel:+919876543210" className="flex items-center gap-2.5 text-sm footer-link hover:text-white text-gray-400">
               <Phone className="w-4 h-4 text-[#e51e25] shrink-0" />
-              <p>+1-234-567-890</p>
-            </div>
+              <p>+91 98765 43210</p>
+            </a>
 
-            <div className="flex items-center gap-2.5 text-sm footer-link hover:text-white cursor-pointer">
+            <a href="mailto:support@moviedekho.com" className="flex items-center gap-2.5 text-sm footer-link hover:text-white text-gray-400">
               <Mail className="w-4 h-4 text-[#e51e25] shrink-0" />
-              <p>contact@example.com</p>
-            </div>
+              <p>support@moviedekho.com</p>
+            </a>
           </div>
         </div>
 
         {/* --- Bottom Section --- */}
         <div className="border-t border-gray-800 pt-6 pb-4 text-center">
           <p className="text-xs">
-            Copyright 2025 © MovieDekho. All Rights Reserved.
+            Copyright 2026 © MovieDekho. All Rights Reserved.
           </p>
         </div>
       </div>
