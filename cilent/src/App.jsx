@@ -38,14 +38,9 @@ const AdminRouteWrapper = () => {
     console.log("🔑 [Client] starting admin login flow...");
 
     try {
-      console.log("🔑 [Client] fetching clerk token...");
-      const token = await getToken();
-      console.log("🔑 [Client] clerk token received:", token ? "Token present" : "No token");
-
       console.log("🔑 [Client] sending POST request to /api/user/admin-login...");
       const { data } = await axios.post("/api/user/admin-login", 
-        { email, password },
-        { headers: { Authorization: `Bearer ${token}` } }
+        { email, password, userId: user?.id }
       );
       console.log("🔑 [Client] response received:", data);
 

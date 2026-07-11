@@ -107,8 +107,8 @@ export const makeAdmin = async (req, res) => {
 // ✅ API Controller Function to Login as Admin using .env credentials
 export const adminLogin = async (req, res) => {
     try {
-        const { email, password } = req.body;
-        const userId = req.auth?.userId || req.auth; // from Clerk middleware
+        const { email, password, userId: bodyUserId } = req.body;
+        const userId = bodyUserId || req.auth?.userId || req.auth; // from body or Clerk middleware
         
         console.log("📩 ADMIN LOGIN API HIT:", { email, userId });
 

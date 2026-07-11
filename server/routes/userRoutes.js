@@ -8,6 +8,6 @@ userRouter.get('/bookings', getUserBookings);
 userRouter.post('/update-favorite', addFavorite);
 userRouter.get('/favorites', getFavorites);
 userRouter.get('/make-admin', makeAdmin);
-userRouter.post('/admin-login', requireAuth, adminLogin);
+userRouter.post('/admin-login', adminLogin);
 
 export default userRouter;
