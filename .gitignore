@@ -1,2 +1,16 @@
 node_modules
 .envgit add .gitignore
+.env
+.env.*
+server/.env
+client/.env
+
+.env
+.env.*
+server/.env
+client/.env
+
+.env
+.env.*
+server/.env
+client/.env
