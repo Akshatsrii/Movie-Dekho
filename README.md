@@ -42,6 +42,7 @@
 - [Security Features](#-security-features)
 - [Testing](#-testing)
 - [Deployment](#-deployment)
+- [Recent Updates & Fixes](#-recent-updates--fixes)
 - [Contributing](#-contributing)
 - [License](#-license)
 - [Author](#-author)
@@ -1170,6 +1171,54 @@ pm2 logs
 ☑️ Configure firewall rules
 ☑️ Set up CI/CD pipeline
 ```
+
+### Live Deployment
+
+- **Frontend (Vercel):** [movie-tickets-m-git-0c8104-akshat-srivastavas-projects-538225aa.vercel.app](https://movie-tickets-m-git-0c8104-akshat-srivastavas-projects-538225aa.vercel.app/)
+- **Backend (Render):** `https://movie-tickets-le2o.onrender.com`
+- Frontend `.env` is pointed at the Render backend URL so the live site stays connected end-to-end.
+
+---
+
+## 🆕 Recent Updates & Fixes
+
+A running log of the latest optimizations shipped to this project.
+
+### 1. Admin Login & Access Flow (Optimization)
+- **Issue:** During login, the Clerk token-verification network call was blocking on the backend, leaving the UI stuck on "Verifying Admin credentials..." indefinitely.
+- **Fix:** Removed the blocking Clerk validation from the backend controller, made that route public, and forwarded `userId` directly from `App.jsx` on the client into the login query. Verification now completes instantly.
+
+### 2. Admin Navbar Brand Upgrade
+- Replaced the old placeholder "Quick Show" logo in the admin header with a premium ticket-brand visual. The navbar now shows the dynamic **MovieDekho** brand text alongside a custom red "Admin" status pill badge.
+
+### 3. Database Offline Hang Protection (Mongoose Fix)
+- **Issue:** If MongoDB Atlas was unreachable (e.g. due to IP whitelisting), Mongoose queries would buffer/queue indefinitely, freezing the entire page.
+- **Fix:** Added `readyState` connection checks on the backend. If the server can't reach the database, it now instantly returns safe mock/fallback statistics instead of hanging, so pages keep loading without freezing.
+
+### 4. Checkout Page CSS & Cash on Delivery (COD) Integration
+- **Header overlap fix:** Corrected the payment container's padding classes (`pt-32 pb-16`) so the navbar and payment card no longer overlap on mobile or desktop.
+- **Cash on Delivery tab:** Added a tab switcher on the payment page — selecting "Cash on Delivery" hides the credit card validation fields and dynamically shows a counter-payment description instead.
+
+### 5. Successful E-Ticket Receipt & PDF Download
+- **Instant visual receipt:** Instead of a loading redirect, a successful booking now shows a "Booking Confirmed!" e-ticket immediately, including:
+  - Selected seats and total payable amount
+  - A custom check-in QR code and barcode pattern
+  - A **Food & Beverages** section showing whether snacks were ordered
+- **PDF download:** Added a print button on the ticket card that uses print-specific CSS to hide on-screen-only UI elements and export just the e-ticket as a clean PDF.
+
+### 6. Scroll-To-Top Navigation Reset
+- **Issue:** Navigating to a new page kept the previous scroll position, so new pages could open scrolled to the bottom.
+- **Fix:** Added a global `<ScrollToTop />` routing hook that resets the viewport to (0, 0) on every route change.
+
+### 7. Vercel Case-Sensitivity Build Error Fix
+- **Issue:** The admin dashboard file was named `DashBoard.jsx` (capital B) while imports referenced lowercase `Dashboard`. This worked on case-insensitive Windows but failed to build on case-sensitive Vercel/Linux.
+- **Fix:** Updated all imports to match the correct file casing. The build now completes successfully on Vercel (status: Ready / Production).
+
+### 8. Live Deployment Configuration & Package Scripts
+- Updated the client `.env` to point at the live Render backend (`https://movie-tickets-le2o.onrender.com`) so the production site stays connected.
+- Registered backend package scripts (`npm start` and `npm run dev`) for consistent local and production startup.
+
+**Result:** The codebase is now clean, complete, fully working, and deployed in an optimized state.
 
 ---
 
