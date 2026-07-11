@@ -4,7 +4,7 @@ import mongoose from "mongoose";
 const bookingSchema = new mongoose.Schema(
   {
     user: {
-      type: mongoose.Schema.Types.ObjectId,
+      type: String,
       ref: "User", // links booking to a user
       required: true,
     },
@@ -28,6 +28,13 @@ const bookingSchema = new mongoose.Schema(
     paymentLink: {
       type: String,
     },
+    snacks: [
+      {
+        name: { type: String, required: true },
+        quantity: { type: Number, required: true },
+        price: { type: Number, required: true }
+      }
+    ]
   },
   { timestamps: true } // adds createdAt and updatedAt automatically
 );

@@ -1,8 +1,9 @@
-﻿import React, { useState } from "react";
+import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import BlurCircle from "./BlurCircle";
 import { ArrowLeft, CreditCard, CheckCircle2, ShieldCheck, Ticket, Sparkles } from "lucide-react";
 import toast from "react-hot-toast";
+import { useAppContext } from "../context/AppContext";
 
 const Payment = () => {
   const navigate = useNavigate();
@@ -65,21 +66,33 @@ const Payment = () => {
 
   const payableTotal = Math.max(0, amount - discount);
 
-  const handlePayment = (e) => {
+  const { getToken, axios } = useAppContext();
+
+  const handlePayment = async (e) => {
     e.preventDefault();
     const loadingToastId = toast.loading("Processing secure Stripe payment...", { id: "stripe_payment" });
 
-    setTimeout(() => {
-      try {
-        if (orderType === "food_delivery") {
-          // Process standalone in-theater food delivery order
+    try {
+      const token = await getToken();
+      const headers = { Authorization: `Bearer ${token}` };
+
+      if (orderType === "food_delivery") {
+        // Process standalone in-theater food delivery order in DB
+        const { data } = await axios.post("/api/food-order/create", {
+          screen,
+          seat,
+          items,
+          amount: payableTotal
+        }, { headers });
+
+        if (data.success) {
           const newOrder = {
-            id: "F" + String(Date.now()),
+            id: data.foodOrder._id,
             screen,
             seat,
             amount: payableTotal,
             items,
-            status: "placed"
+            status: "Placed"
           };
           const localOrders = JSON.parse(localStorage.getItem("theater_food_orders") || "[]");
           localOrders.push(newOrder);
@@ -92,8 +105,14 @@ const Payment = () => {
             navigate("/food-order");
           }, 1500);
         } else {
-          // Process ticket booking checkout payment
-          if (bookingId) {
+          toast.error(data.message || "Failed to place food order.", { id: "stripe_payment" });
+        }
+      } else {
+        // Process ticket booking checkout payment in DB
+        if (bookingId) {
+          const { data } = await axios.post("/api/booking/confirm-payment", { bookingId }, { headers });
+
+          if (data.success) {
             const localBookings = JSON.parse(localStorage.getItem("movie_bookings") || "[]");
             const updatedBookings = localBookings.map((b) => {
               if (String(b._id) === String(bookingId)) {
@@ -102,20 +121,24 @@ const Payment = () => {
               return b;
             });
             localStorage.setItem("movie_bookings", JSON.stringify(updatedBookings));
+
+            toast.success("Payment Successful! Tickets generated.", { id: "stripe_payment" });
+            setPaymentSuccess(true);
+            
+            setTimeout(() => {
+              navigate("/my-bookings");
+            }, 1500);
+          } else {
+            toast.error(data.message || "Failed to confirm ticket payment.", { id: "stripe_payment" });
           }
-          
-          toast.success("Payment Successful! Tickets generated.", { id: "stripe_payment" });
-          setPaymentSuccess(true);
-          
-          setTimeout(() => {
-            navigate("/my-bookings");
-          }, 1500);
+        } else {
+          toast.error("No booking ID found.", { id: "stripe_payment" });
         }
-      } catch (err) {
-        console.error(err);
-        toast.error("Payment failed. Please try again.", { id: "stripe_payment" });
       }
-    }, 1200);
+    } catch (err) {
+      console.error(err);
+      toast.error("Payment failed. Please try again.", { id: "stripe_payment" });
+    }
   };
 
   return (

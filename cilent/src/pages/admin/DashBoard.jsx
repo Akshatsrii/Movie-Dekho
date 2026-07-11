@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Star, TrendingUp, Users, Film, DollarSign, Calendar } from "lucide-react";
+import { useAppContext } from "../../context/AppContext";
 
 const BlurCircle = ({ position }) => {
   const positions = {
@@ -133,16 +134,34 @@ const dummyDashboardData = {
 };
 
 const Dashboard = () => {
-  const [dashboardData, setDashboardData] = useState(dummyDashboardData);
+  const { getToken, axios } = useAppContext();
+  const [dashboardData, setDashboardData] = useState({
+    totalBookings: 0,
+    totalRevenue: 0,
+    activeShows: [],
+    totalUser: 0
+  });
   const currency = import.meta.env.VITE_CURRENCY || "₹";
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    // simulate API loading
-    setTimeout(() => {
-      setDashboardData(dummyDashboardData);
+  const fetchDashboardData = async () => {
+    try {
+      const token = await getToken();
+      const { data } = await axios.get("/api/admin/dashboard", {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+      if (data.success) {
+        setDashboardData(data.dashboardData);
+      }
+    } catch (error) {
+      console.error("Error fetching dashboard data:", error);
+    } finally {
       setLoading(false);
-    }, 1000);
+    }
+  };
+
+  useEffect(() => {
+    fetchDashboardData();
   }, []);
 
   if (loading) {

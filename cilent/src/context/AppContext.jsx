@@ -24,13 +24,23 @@ export const AppProvider = ({ children }) => {
   const imageBaseUrl = import.meta.env.VITE_TMDB_IMAGE_BASE_URL;
   const baseUrl = import.meta.env.VITE_BASE_URL;
 
-  // ✅ Everyone is treated as admin (temporary testing)
+  // ✅ Fetch user admin status from backend dynamically using Clerk token
   const fetchIsAdmin = async () => {
     try {
-      setIsAdmin(true);
+      const token = await getToken();
+      const { data } = await axios.get("/api/admin/is-admin", {
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      });
+      if (data.success && data.isAdmin) {
+        setIsAdmin(true);
+      } else {
+        setIsAdmin(false);
+      }
     } catch (error) {
-      console.error(error);
-      setIsAdmin(true);
+      console.error("Error verifying admin status:", error);
+      setIsAdmin(false);
     }
   };
 

@@ -26,8 +26,11 @@ const checkSeatsAvailability = async (showId, selectedSeats) => {
 // ----------------------------------------------------------------------
 export const createBooking = async (req, res) => {
   try {
-    const userId = req.auth; // from middleware (Clerk or JWT)
-    const { showId, selectedSeats } = req.body;
+    const userId = req.auth?.userId || req.auth; // from Clerk middleware
+    if (!userId) {
+      return res.status(401).json({ success: false, message: "Unauthorized. Please log in." });
+    }
+    const { showId, selectedSeats, snacks } = req.body;
     const { origin } = req.headers; // frontend origin (http://localhost:5173)
 
     // 1️⃣ Check seat availability
@@ -48,12 +51,17 @@ export const createBooking = async (req, res) => {
       });
     }
 
+    // Calculate snacks amount and total amount
+    const snacksAmount = (snacks || []).reduce((acc, snack) => acc + (snack.price * snack.quantity), 0);
+    const totalAmount = (showData.showPrice * selectedSeats.length) + snacksAmount;
+
     // 3️⃣ Create a new booking in DB
     const booking = await Booking.create({
       user: userId,
       show: showId,
-      amount: showData.showPrice * selectedSeats.length,
+      amount: totalAmount,
       bookedSeats: selectedSeats,
+      snacks: snacks || [],
     });
 
     // 4️⃣ Mark selected seats as occupied
@@ -63,28 +71,50 @@ export const createBooking = async (req, res) => {
     showData.markModified("occupiedSeats");
     await showData.save();
 
-    // 5️⃣ Create Stripe checkout session
-    const session = await stripeInstance.checkout.sessions.create({
-      payment_method_types: ["card"],
-      line_items: [
-        {
+    // 5️⃣ Build Stripe line items
+    const line_items = [
+      {
+        price_data: {
+          currency: "inr",
+          product_data: {
+            name: `${showData.movie?.title || "Movie Ticket"} - Ticket`,
+            description: `Seats: ${selectedSeats.join(", ")}`,
+          },
+          unit_amount: Math.floor(showData.showPrice * 100),
+        },
+        quantity: selectedSeats.length,
+      }
+    ];
+
+    if (snacks && snacks.length > 0) {
+      snacks.forEach((snack) => {
+        line_items.push({
           price_data: {
             currency: "inr",
             product_data: {
-              name: showData.movie?.title || "Movie Ticket",
-              description: `Seats: ${selectedSeats.join(", ")}`,
+              name: `${snack.name} (Snack)`,
+              description: `Quantity: ${snack.quantity}`,
             },
-            unit_amount: Math.floor(showData.showPrice * 100),
+            unit_amount: Math.floor(snack.price * 100),
           },
-          quantity: selectedSeats.length,
-        },
-      ],
+          quantity: snack.quantity,
+        });
+      });
+    }
+
+    // 6️⃣ Create Stripe checkout session
+    const session = await stripeInstance.checkout.sessions.create({
+      payment_method_types: ["card"],
+      line_items,
       mode: "payment",
       success_url: `${origin}/payment-success?bookingId=${booking._id}`,
       cancel_url: `${origin}/payment-failed?bookingId=${booking._id}`,
+      metadata: {
+        bookingId: booking._id.toString()
+      }
     });
 
-    // 6️⃣ Save payment link
+    // 7️⃣ Save payment link
     booking.paymentLink = session.url;
     await booking.save();
 
@@ -94,7 +124,7 @@ export const createBooking = async (req, res) => {
       paymentUrl: session.url,
     });
   } catch (error) {
-    console.error(error);
+    console.error("Error creating booking:", error);
     res.json({
       success: false,
       message: error.message,
@@ -135,7 +165,7 @@ export const getOccupiedSeats = async (req, res) => {
 // ----------------------------------------------------------------------
 export const getMyBookings = async (req, res) => {
   try {
-    const userId = req.auth;
+    const userId = req.auth?.userId || req.auth;
     if (!userId) {
       return res.status(401).json({ success: false, message: "Unauthorized" });
     }
@@ -153,5 +183,32 @@ export const getMyBookings = async (req, res) => {
       message: "Failed to fetch bookings",
       error: error.message,
     });
+  }
+};
+
+// ----------------------------------------------------------------------
+// Function to confirm booking payment directly (Fallback/Mock)
+// ----------------------------------------------------------------------
+export const confirmPayment = async (req, res) => {
+  try {
+    const { bookingId } = req.body;
+    if (!bookingId) {
+      return res.status(400).json({ success: false, message: "Missing booking ID" });
+    }
+
+    const booking = await Booking.findByIdAndUpdate(
+      bookingId,
+      { isPaid: true },
+      { new: true }
+    );
+
+    if (!booking) {
+      return res.status(404).json({ success: false, message: "Booking not found" });
+    }
+
+    res.json({ success: true, message: "Booking marked as paid in database", booking });
+  } catch (error) {
+    console.error("Error confirming payment:", error);
+    res.status(500).json({ success: false, message: error.message });
   }
 };

@@ -25,9 +25,39 @@ import ListShows from './pages/admin/ListShows';
 import ListBookings from './pages/admin/ListBookings';
 import { useAppContext } from './context/AppContext';
 
+const AdminRouteWrapper = () => {
+  const { user, isAdmin } = useAppContext();
+
+  if (!user) {
+    return (
+      <div className="min-h-screen flex flex-col justify-center items-center bg-[#fffaf9] p-4">
+        <SignIn fallbackRedirect="/admin" />
+      </div>
+    );
+  }
+
+  if (!isAdmin) {
+    return (
+      <div className="min-h-screen flex flex-col justify-center items-center bg-[#fffaf9] text-center p-6">
+        <div className="bg-white border border-red-100 p-8 rounded-3xl shadow-xl max-w-md">
+          <h1 className="text-2xl font-black text-[#e51e25] mb-3">Access Denied</h1>
+          <p className="text-zinc-550 font-semibold mb-6">You are signed in but do not have administrator permissions to access the dashboard.</p>
+          <button 
+            onClick={() => window.location.href = "/"} 
+            className="px-8 py-3 bg-[#e51e25] hover:bg-[#c4161c] text-white rounded-xl font-bold shadow-md hover:shadow-lg transition-all cursor-pointer uppercase text-xs tracking-wider"
+          >
+            Go to Home Page
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return <Layout />;
+};
+
 const App = () => {
   const isAdminRoute = useLocation().pathname.startsWith('/admin');
-  const {user}=useAppContext();
 
   return (
     <>
@@ -49,11 +79,7 @@ const App = () => {
         <Route path="/payment" element={<Payment />} /> {/* ✅ Add this line */}
 
         {/* ✅ Admin routes nested under Layout */}
-        <Route path="/admin/*" element={ user ? <Layout /> : 
-        <div className = 'min-h-screen flex justify-center items-center'>
-           <SignIn fallbackRedirect="/admin" /> 
-           <p>Please sign in to access the admin panel.</p>
-           </div>}>
+        <Route path="/admin/*" element={<AdminRouteWrapper />}>
           <Route index element={<Dashboard />} />
           <Route path="add-shows" element={<AddShows />} />
           <Route path="list-shows" element={<ListShows />} />

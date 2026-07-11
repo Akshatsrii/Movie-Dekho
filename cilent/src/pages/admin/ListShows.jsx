@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Film, Clock, Users, DollarSign, TrendingUp, Calendar } from 'lucide-react';
 import { dummyShowsData } from "../../assets/assets";
+import { useAppContext } from "../../context/AppContext";
 
 
 const BlurCircle = ({ position }) => {
@@ -29,6 +30,7 @@ const dateFormat = (dateString) => {
 };
 
 export default function ListShows() {
+  const { getToken, axios } = useAppContext();
   const currency = import.meta.env.VITE_CURRENCY || "₹";
   
   const [shows, setShows] = useState([]);
@@ -41,104 +43,31 @@ export default function ListShows() {
 
   const getAllShows = async () => {
     try {
-      // Enhanced dummy data with multiple shows
-      const dummyShows = [
-        {
-          movie: dummyShowsData[0],
-          showDateTime: "2025-11-05T14:30:00.000Z",
-          showPrice: 250,
-          occupiedSeats: {
-            A1: "user_1", A2: "user_2", B1: "user_3", B2: "user_4",
-            C1: "user_5", C2: "user_6", D1: "user_7", D2: "user_8"
-          }
-        },
-        {
-          movie: dummyShowsData[1],
-          showDateTime: "2025-11-05T18:00:00.000Z",
-          showPrice: 350,
-          occupiedSeats: {
-            A1: "user_1", A2: "user_2", A3: "user_3", B1: "user_4",
-            B2: "user_5", C1: "user_6", C2: "user_7", D1: "user_8",
-            D2: "user_9", E1: "user_10", E2: "user_11", F1: "user_12"
-          }
-        },
-        {
-          movie: dummyShowsData[2],
-          showDateTime: "2025-11-06T11:00:00.000Z",
-          showPrice: 300,
-          occupiedSeats: {
-            A1: "user_1", A2: "user_2", B1: "user_3", C1: "user_4", D1: "user_5"
-          }
-        },
-        {
-          movie: dummyShowsData[3],
-          showDateTime: "2025-11-06T15:30:00.000Z",
-          showPrice: 280,
-          occupiedSeats: {
-            A1: "user_1", A2: "user_2", A3: "user_3", B1: "user_4",
-            B2: "user_5", C1: "user_6", C2: "user_7"
-          }
-        },
-        {
-          movie: dummyShowsData[4],
-          showDateTime: "2025-11-06T19:00:00.000Z",
-          showPrice: 320,
-          occupiedSeats: {
-            A1: "user_1", B1: "user_2", C1: "user_3", D1: "user_4",
-            E1: "user_5", F1: "user_6", G1: "user_7", H1: "user_8",
-            I1: "user_9", J1: "user_10"
-          }
-        },
-        {
-          movie: dummyShowsData[5],
-          showDateTime: "2025-11-07T12:00:00.000Z",
-          showPrice: 400,
-          occupiedSeats: {
-            A1: "user_1", A2: "user_2", A3: "user_3", A4: "user_4",
-            B1: "user_5", B2: "user_6", B3: "user_7", B4: "user_8",
-            C1: "user_9", C2: "user_10", C3: "user_11", C4: "user_12",
-            D1: "user_13", D2: "user_14", D3: "user_15"
-          }
-        },
-        {
-          movie: dummyShowsData[0],
-          showDateTime: "2025-11-07T16:30:00.000Z",
-          showPrice: 250,
-          occupiedSeats: {
-            A1: "user_1", A2: "user_2", B1: "user_3", B2: "user_4"
-          }
-        },
-        {
-          movie: dummyShowsData[1],
-          showDateTime: "2025-11-07T20:00:00.000Z",
-          showPrice: 350,
-          occupiedSeats: {
-            A1: "user_1", A2: "user_2", A3: "user_3", A4: "user_4",
-            B1: "user_5", B2: "user_6", C1: "user_7", C2: "user_8"
-          }
-        }
-      ];
-
-      setShows(dummyShows);
-
-      // Calculate stats
-      const totalBookings = dummyShows.reduce(
-        (sum, show) => sum + Object.keys(show.occupiedSeats || {}).length, 
-        0
-      );
-      const totalEarnings = dummyShows.reduce(
-        (sum, show) => sum + (Object.keys(show.occupiedSeats || {}).length * show.showPrice), 
-        0
-      );
-
-      setStats({
-        totalShows: dummyShows.length,
-        totalBookings,
-        totalEarnings
+      const token = await getToken();
+      const { data } = await axios.get("/api/admin/all-shows", {
+        headers: { Authorization: `Bearer ${token}` }
       });
+      if (data.success) {
+        const fetchedShows = data.shows || [];
+        setShows(fetchedShows);
 
+        const totalBookings = fetchedShows.reduce(
+          (sum, show) => sum + Object.keys(show.occupiedSeats || {}).length, 
+          0
+        );
+        const totalEarnings = fetchedShows.reduce(
+          (sum, show) => sum + (Object.keys(show.occupiedSeats || {}).length * (show.showPrice || 0)), 
+          0
+        );
+
+        setStats({
+          totalShows: fetchedShows.length,
+          totalBookings,
+          totalEarnings
+        });
+      }
     } catch (error) {
-      console.error(error);
+      console.error("Error fetching shows:", error);
     } finally {
       setLoading(false);
     }

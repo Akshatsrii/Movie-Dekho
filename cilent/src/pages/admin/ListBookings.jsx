@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from "react";
 import { User, Film, Calendar, DollarSign, Armchair, TrendingUp, Users, Ticket } from 'lucide-react';
+import { useAppContext } from "../../context/AppContext";
 
 const BlurCircle = ({ position }) => {
   const positions = {
@@ -136,6 +137,7 @@ const dummyBookingData = [
 ];
 
 const ListBookings = () => {
+  const { getToken, axios } = useAppContext();
   const currency = import.meta.env.VITE_CURRENCY || "₹";
   const [bookings, setBookings] = useState([]);
   const [isLoading, setIsLoading] = useState(true);
@@ -147,44 +149,60 @@ const ListBookings = () => {
 
   const getAllBookings = async () => {
     try {
-      const localBookings = JSON.parse(localStorage.getItem("movie_bookings") || "[]");
-      const formattedBookings = localBookings.map(b => ({
-        user: { name: "Akshat Srivastav" },
-        show: { movie: { title: b.show.movie.title } },
-        seats: b.bookedSeats,
-        totalAmount: b.bookedSeats.length * b.show.pricePerSeat + (b.snacks || []).reduce((t, s) => t + s.price * s.quantity, 0),
-        createdAt: b.show.showDateTime,
-        isPaid: b.isPaid
-      }));
+      const token = await getToken();
+      const headers = { Authorization: `Bearer ${token}` };
 
-      const localFood = JSON.parse(localStorage.getItem("theater_food_orders") || "[]");
-      const formattedFood = localFood.map(o => ({
-        user: { name: "Akshat Srivastav" },
-        show: { movie: { title: `F&B Delivery (${o.screen})` } },
-        seats: [`Seat ${o.seat}`],
-        totalAmount: o.amount,
-        createdAt: new Date().toISOString(),
-        isPaid: true
-      }));
+      // Fetch bookings and food orders in parallel
+      const [bookingsRes, foodOrdersRes] = await Promise.all([
+        axios.get("/api/admin/all-bookings", { headers }),
+        axios.get("/api/food-order/all", { headers }).catch(err => {
+          console.error("Food orders API failed:", err);
+          return { data: { success: false, orders: [] } };
+        })
+      ]);
+
+      let formattedBookings = [];
+      if (bookingsRes.data.success) {
+        formattedBookings = (bookingsRes.data.bookings || []).map(b => ({
+          user: { name: b.user?.name || "Clerk User" },
+          show: { movie: { title: b.show?.movie?.title || "Movie Ticket" } },
+          seats: b.bookedSeats || [],
+          totalAmount: b.amount || 0,
+          createdAt: b.createdAt,
+          isPaid: b.isPaid,
+          snacks: b.snacks || []
+        }));
+      }
+
+      let formattedFood = [];
+      if (foodOrdersRes.data.success) {
+        formattedFood = (foodOrdersRes.data.orders || []).map(o => ({
+          user: { name: "Seat Delivery" },
+          show: { movie: { title: `F&B Screen: ${o.screen} (Seat ${o.seat})` } },
+          seats: o.items ? o.items.map(item => `${item.name} x${item.quantity}`) : ["F&B Order"],
+          totalAmount: o.amount || 0,
+          createdAt: o.createdAt,
+          isPaid: o.isPaid,
+          snacks: o.items || []
+        }));
+      }
 
       const combined = [...formattedBookings, ...formattedFood];
-      const dataToUse = combined.length > 0 ? combined : dummyBookingData;
-      
-      setBookings(dataToUse);
-      
+      setBookings(combined);
+
       // Calculate stats
-      const totalRevenue = dataToUse.reduce((sum, b) => sum + b.totalAmount, 0);
-      const totalSeats = dataToUse.reduce((sum, b) => sum + (b.seats ? b.seats.length : 0), 0);
-      
+      const totalRevenue = combined.reduce((sum, b) => sum + b.totalAmount, 0);
+      const totalSeats = formattedBookings.reduce((sum, b) => sum + b.seats.length, 0);
+
       setStats({
-        totalBookings: dataToUse.length,
+        totalBookings: combined.length,
         totalRevenue,
         totalSeats
       });
-      
-      setIsLoading(false);
+
     } catch (err) {
-      console.error(err);
+      console.error("Error fetching bookings:", err);
+    } finally {
       setIsLoading(false);
     }
   };

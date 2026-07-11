@@ -9,6 +9,8 @@ import showRouter from './routes/showRoutes.js';
 import bookingRouter from "./routes/bookingRoutes.js"; 
 import adminRouter from './routes/adminRoutes.js';
 import userRouter from './routes/userRoutes.js';
+import snackRouter from './routes/snackRoutes.js';
+import foodOrderRouter from './routes/foodOrderRoutes.js';
 import { stripeWebhooks } from './controllers/stripeWebhooks.js';       
 
 
@@ -30,5 +32,7 @@ app.use('/api/shows', showRouter);
 app.use('/api/booking', bookingRouter);
 app.use('/api/admin', adminRouter);
 app.use('/api/user', userRouter);
+app.use('/api/snack', snackRouter);
+app.use('/api/food-order', foodOrderRouter);
 
 app.listen(port, () => console.log(`Server listening at http://localhost:${port}`))
