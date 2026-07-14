@@ -1,9 +1,13 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Lock } from "lucide-react";
+import { useUser, useClerk } from "@clerk/clerk-react";
+import toast from "react-hot-toast";
 
 const DateSelect = ({ dateTime, id }) => {
   const navigate = useNavigate();
+  const { user } = useUser();
+  const { openSignIn } = useClerk();
 
   // Normalize input data
   const dates = Array.isArray(dateTime)
@@ -25,6 +29,21 @@ const DateSelect = ({ dateTime, id }) => {
   const [selectedDate, setSelectedDate] = useState(fallbackDates[0].date);
 
   const handleBookNow = () => {
+    if (!user) {
+      toast("🎬 Please login to book movie tickets!", {
+        icon: "🔒",
+        style: {
+          background: "#1a1a1a",
+          color: "#fff",
+          border: "1px solid rgba(229,30,37,0.5)",
+          fontWeight: "600",
+          borderRadius: "12px",
+        },
+        duration: 2800,
+      });
+      openSignIn();
+      return;
+    }
     if (selectedDate) {
       // ✅ Navigate to SeatLayout page
       navigate(`/movies/${id}/${selectedDate}`);
@@ -74,8 +93,9 @@ const DateSelect = ({ dateTime, id }) => {
 
         <button
           onClick={handleBookNow}
-          className="px-10 py-3 bg-[#e51e25] hover:bg-[#c4161c] text-white hover:scale-105 active:scale-95 rounded-lg text-base font-bold transition-all duration-300 shadow-xl shadow-red-900/30 uppercase tracking-wider flex-shrink-0"
+          className="px-10 py-3 bg-[#e51e25] hover:bg-[#c4161c] text-white hover:scale-105 active:scale-95 rounded-lg text-base font-bold transition-all duration-300 shadow-xl shadow-red-900/30 uppercase tracking-wider flex-shrink-0 flex items-center gap-2"
         >
+          {!user && <Lock className="w-4 h-4" />}
           Book Now
         </button>
       </div>

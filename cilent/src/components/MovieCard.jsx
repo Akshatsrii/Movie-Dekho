@@ -1,13 +1,39 @@
 // src/components/MovieCard.jsx
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { StarIcon } from "lucide-react";
+import { StarIcon, Lock } from "lucide-react";
 import timeformat from "../lib/timeformat"; // make sure this exists or replace with fallback
+import { useUser, useClerk } from "@clerk/clerk-react";
+import toast from "react-hot-toast";
 
 const MovieCard = ({ movie }) => {
   const navigate = useNavigate();
+  const { user } = useUser();
+  const { openSignIn } = useClerk();
 
   const handleNavigation = () => {
+    if (movie?._id || movie?.id) {
+      navigate(`/movies/${movie._id || movie.id}`);
+      window.scrollTo(0, 0);
+    }
+  };
+
+  const handleBuyTickets = (e) => {
+    e.stopPropagation();
+    if (!user) {
+      toast("🎬 Please login to book tickets!", {
+        icon: "🔒",
+        style: {
+          background: "#1a1a1a",
+          color: "#fff",
+          border: "1px solid rgba(229,30,37,0.4)",
+          fontWeight: "600",
+        },
+        duration: 2500,
+      });
+      openSignIn();
+      return;
+    }
     if (movie?._id || movie?.id) {
       navigate(`/movies/${movie._id || movie.id}`);
       window.scrollTo(0, 0);
@@ -52,9 +78,10 @@ const MovieCard = ({ movie }) => {
       {/* Rating and Buy Button */}
       <div className="flex items-center justify-between mt-4 pb-3">
         <button
-          onClick={handleNavigation}
-          className="px-4 py-2 text-xs bg-[#e51e25] hover:bg-[#c4161c] text-white hover:scale-105 active:scale-95 transition-all duration-300 rounded-full font-medium cursor-pointer shadow-[0_4px_14px_rgba(229,30,37,0.3)]"
+          onClick={handleBuyTickets}
+          className="px-4 py-2 text-xs bg-[#e51e25] hover:bg-[#c4161c] text-white hover:scale-105 active:scale-95 transition-all duration-300 rounded-full font-medium cursor-pointer shadow-[0_4px_14px_rgba(229,30,37,0.3)] flex items-center gap-1.5"
         >
+          {!user && <Lock className="w-3 h-3" />}
           Buy Tickets
         </button>
 

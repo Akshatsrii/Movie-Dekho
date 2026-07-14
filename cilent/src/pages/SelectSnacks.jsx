@@ -1,8 +1,9 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { useLocation, useNavigate, useParams } from "react-router-dom";
-import { Plus, Minus, ShoppingBag, ArrowLeft, Ticket } from "lucide-react";
+import { Plus, Minus, ShoppingBag, ArrowLeft, Ticket, Lock } from "lucide-react";
 import BlurCircle from "../components/BlurCircle";
 import toast from "react-hot-toast";
+import { useUser, useClerk } from "@clerk/clerk-react";
 
 const snackItems = [
   { id: "p1", name: "Classic Salted Popcorn", price: 180, category: "Popcorn", image: "https://images.unsplash.com/photo-1578849278619-e73505e9610f?auto=format&fit=crop&w=400&q=80" },
@@ -23,6 +24,26 @@ const SelectSnacks = () => {
   const location = useLocation();
   const navigate = useNavigate();
   const { id, date } = useParams();
+  const { user } = useUser();
+  const { openSignIn } = useClerk();
+
+  // ✅ Auth guard
+  useEffect(() => {
+    if (!user) {
+      toast("🔒 Please login to continue booking!", {
+        icon: "🎬",
+        style: {
+          background: "#111",
+          color: "#fff",
+          border: "1px solid rgba(229,30,37,0.5)",
+          fontWeight: "700",
+          borderRadius: "14px",
+        },
+        duration: 3000,
+      });
+      openSignIn();
+    }
+  }, [user]);
 
   const { selectedTime, selectedSeats = [], show } = location.state || {};
 

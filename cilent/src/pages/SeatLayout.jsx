@@ -1,10 +1,11 @@
-﻿import React, { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
 import { assets, dummyDateTimeData, dummyShowsData } from "../assets/assets";
-import { ClockIcon, Armchair, Eye, X } from "lucide-react";
+import { ClockIcon, Armchair, Eye, X, Lock } from "lucide-react";
 import isoTimeFormat from "../lib/isoTimeFormat";
 import BlurCircle from "../components/BlurCircle";
 import toast from "react-hot-toast";
+import { useUser, useClerk } from "@clerk/clerk-react";
 
 const SeatLayout = () => {
   const groupRows = [
@@ -21,6 +22,26 @@ const SeatLayout = () => {
   const [show, setShow] = useState(null);
   const [previewSeat, setPreviewSeat] = useState(null); // Unique 3D Preview State
   const navigate = useNavigate();
+  const { user } = useUser();
+  const { openSignIn } = useClerk();
+
+  // ✅ Auth guard: redirect unauthenticated users
+  useEffect(() => {
+    if (!user) {
+      toast("🔒 Please login to select seats & book tickets!", {
+        icon: "🎬",
+        style: {
+          background: "#111",
+          color: "#fff",
+          border: "1px solid rgba(229,30,37,0.5)",
+          fontWeight: "700",
+          borderRadius: "14px",
+        },
+        duration: 3000,
+      });
+      openSignIn();
+    }
+  }, [user]);
 
   const timings = dummyDateTimeData[date] && dummyDateTimeData[date].length > 0
     ? dummyDateTimeData[date]
@@ -43,6 +64,14 @@ const SeatLayout = () => {
   }, [date]);
 
   const handleSeatClick = (seatId) => {
+    if (!user) {
+      toast("🔒 Login required to select seats!", {
+        style: { background: "#111", color: "#fff", border: "1px solid rgba(229,30,37,0.5)", fontWeight: "700", borderRadius: "14px" },
+        duration: 2500,
+      });
+      openSignIn();
+      return;
+    }
     if (!selectedTime) {
       return toast.error("Please select time first");
     }

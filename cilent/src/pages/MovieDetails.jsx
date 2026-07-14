@@ -1,19 +1,21 @@
-﻿// MovieDetails.jsx
+// MovieDetails.jsx
 import React, { useEffect, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import { dummyDateTimeData, dummyShowsData } from "../assets/assets";
 import BlurCircle from "../components/BlurCircle";
 import DateSelect from "../components/DateSelect";
 import MovieCard from "../components/MovieCard";
-import { Star, PlayCircle, Heart, User, Send, Ticket, X } from "lucide-react";
+import { Star, PlayCircle, Heart, User, Send, Ticket, X, Lock } from "lucide-react";
 import { useAppContext } from "../context/AppContext";
+import { useClerk } from "@clerk/clerk-react";
 import toast from "react-hot-toast";
 
 const MovieDetails = () => {
   const { id } = useParams();
   const navigate = useNavigate();
 
-  const { favoriteMovies = [], toggleFavourite, imageBaseUrl = "" } = useAppContext();
+  const { favoriteMovies = [], toggleFavourite, imageBaseUrl = "", user } = useAppContext();
+  const { openSignIn } = useClerk();
 
   const [show, setShow] = useState(null);
   
@@ -84,6 +86,22 @@ const MovieDetails = () => {
   const scrollToTop = () => window.scrollTo(0, 0);
 
   const scrollToDateSection = () => {
+    if (!user) {
+      toast("🎬 Login required to book tickets!", {
+        icon: "🔒",
+        style: {
+          background: "#111",
+          color: "#fff",
+          border: "1px solid rgba(229,30,37,0.5)",
+          fontWeight: "700",
+          borderRadius: "14px",
+          fontSize: "14px",
+        },
+        duration: 3000,
+      });
+      openSignIn();
+      return;
+    }
     const dateSection = document.getElementById("date-section");
     if (dateSection) dateSection.scrollIntoView({ behavior: "smooth" });
   };
@@ -192,7 +210,7 @@ const MovieDetails = () => {
               onClick={scrollToDateSection}
               className="px-8 py-3.5 bg-[#e51e25] hover:bg-[#c4161c] text-white hover:scale-105 active:scale-95 transition-all duration-300 rounded-full font-bold shadow-[0_6px_20px_rgba(229,30,37,0.35)] flex items-center gap-2 cursor-pointer text-sm"
             >
-              <Ticket className="w-5 h-5" />
+              {!user ? <Lock className="w-5 h-5" /> : <Ticket className="w-5 h-5" />}
               Book Tickets
             </button>
 

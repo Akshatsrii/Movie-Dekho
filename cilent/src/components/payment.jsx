@@ -1,15 +1,36 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import BlurCircle from "./BlurCircle";
-import { ArrowLeft, CreditCard, CheckCircle2, ShieldCheck, Ticket, Sparkles, Download } from "lucide-react";
+import { ArrowLeft, CreditCard, CheckCircle2, ShieldCheck, Ticket, Sparkles, Download, Lock } from "lucide-react";
 import toast from "react-hot-toast";
 import { useAppContext } from "../context/AppContext";
+import { useUser, useClerk } from "@clerk/clerk-react";
 
 const Payment = () => {
   const navigate = useNavigate();
   const location = useLocation();
   const [paymentSuccess, setPaymentSuccess] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState("card"); // "card" or "cod"
+  const { user } = useUser();
+  const { openSignIn } = useClerk();
+
+  // ✅ Auth guard for Payment page
+  useEffect(() => {
+    if (!user) {
+      toast("🔒 Login required to complete payment!", {
+        icon: "🎬",
+        style: {
+          background: "#111",
+          color: "#fff",
+          border: "1px solid rgba(229,30,37,0.5)",
+          fontWeight: "700",
+          borderRadius: "14px",
+        },
+        duration: 3000,
+      });
+      openSignIn();
+    }
+  }, [user]);
 
   // Parse state details passed from checkout
   const bookingId = location.state?.bookingId || null;
